@@ -106,17 +106,15 @@ def getPower(power, ballDimension, deltaV):
 
 	memberships = []
 	if closeBig > 0:		
-		if deceleratingBig > 0: memberships.append([(closeBig+deceleratingBig)/2, NO_SPEED_CHANGE])
+		if deceleratingBig > 0: memberships.append([(closeBig+deceleratingBig)/2, -SMALL_SPEED_CHANGE])
 		if deceleratingSmall > 0: memberships.append([(closeBig+deceleratingSmall)/2, -BIG_SPEED_CHANGE])
 		if speedConstant > 0: memberships.append([(closeBig+speedConstant)/2, -BIG_SPEED_CHANGE])
 		if acceleratingSmall > 0: memberships.append([(closeBig+acceleratingSmall)/2, -BIG_SPEED_CHANGE])
 		if acceleratingBig > 0: memberships.append([(closeBig+acceleratingBig)/2, -BIG_SPEED_CHANGE])
 		
 	if (closeSmall > 0):
-		#Changed from SMALL_SPEED_CHANGE
 		if deceleratingBig > 0: memberships.append([(closeSmall+deceleratingBig)/2, BIG_SPEED_CHANGE])
-		#Changed from NO_SPEED_CHANGE
-		if deceleratingSmall > 0: memberships.append([(closeSmall+deceleratingSmall)/2, SMALL_SPEED_CHANGE])
+		if deceleratingSmall > 0: memberships.append([(closeSmall+deceleratingSmall)/2, NO_SPEED_CHANGE])
 		if speedConstant > 0: memberships.append([(closeSmall+speedConstant)/2, -SMALL_SPEED_CHANGE])
 		if acceleratingSmall > 0: memberships.append([(closeSmall+acceleratingSmall)/2, -SMALL_SPEED_CHANGE])
 		if acceleratingBig > 0: memberships.append([(closeSmall+acceleratingBig)/2, -BIG_SPEED_CHANGE])
@@ -132,16 +130,15 @@ def getPower(power, ballDimension, deltaV):
 		if deceleratingBig > 0: memberships.append([(farSmall+deceleratingBig)/2, BIG_SPEED_CHANGE])
 		if deceleratingSmall > 0: memberships.append([(farSmall+deceleratingSmall)/2, SMALL_SPEED_CHANGE])
 		if speedConstant > 0: memberships.append([(farSmall+speedConstant)/2, SMALL_SPEED_CHANGE])
-		#Changed from NO_SPEED_CHANGE
-		if acceleratingSmall > 0: memberships.append([(farSmall+acceleratingSmall)/2, -SMALL_SPEED_CHANGE])
-		if acceleratingBig > 0: memberships.append([(farSmall+acceleratingBig)/2, -BIG_SPEED_CHANGE])
+		if acceleratingSmall > 0: memberships.append([(farSmall+acceleratingSmall)/2, NO_SPEED_CHANGE])
+		if acceleratingBig > 0: memberships.append([(farSmall+acceleratingBig)/2, -SMALL_SPEED_CHANGE])
 
 	if (farBig > 0): 
 		if deceleratingBig > 0: memberships.append([(farBig+deceleratingBig)/2, BIG_SPEED_CHANGE])
 		if deceleratingSmall > 0: memberships.append([(farBig+deceleratingSmall)/2, BIG_SPEED_CHANGE])
 		if speedConstant > 0: memberships.append([(farBig+speedConstant)/2, BIG_SPEED_CHANGE])
 		if acceleratingSmall > 0: memberships.append([(farBig+acceleratingSmall)/2, BIG_SPEED_CHANGE])
-		if acceleratingBig > 0: memberships.append([(farBig+acceleratingBig)/2, NO_SPEED_CHANGE])
+		if acceleratingBig > 0: memberships.append([(farBig+acceleratingBig)/2, SMALL_SPEED_CHANGE])
 
 	weightedAreaSum = 0
 	areaSum = 0
