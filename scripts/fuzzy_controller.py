@@ -86,24 +86,24 @@ def adjustPowerForTurning(power, ballPosition):
 	return power, power
 
 rospy.init_node('fuzzy_controller', anonymous=True)
-pub = rospy.Publisher('/zumo/power', Int16MultiArray, queue_size = 1)
+pub = rospy.Publisher('/zumo/power', Int16MultiArray, queue_size = 10)
 
 #Size of target
-targetUndersizeBig = FuzzyTrapezoid(0, 0, 70, 80)
-targetUndersizeSmall = FuzzyTriangle(70, 80, 90) 
-targetIdealSize = FuzzyTriangle(85, 90, 95)
-targetOversizeSmall = FuzzyTriangle(90, 100, 110)
-targetOversizeBig = FuzzyTrapezoid(100, 110, 500, 500)
+targetUndersizeBig = FuzzyTrapezoid(0, 0, 60, 70)
+targetUndersizeSmall = FuzzyTriangle(65, 80, 88)
+targetIdealSize = FuzzyTriangle(85, 90, 100)
+targetOversizeSmall = FuzzyTriangle(92, 105, 120)
+targetOversizeBig = FuzzyTrapezoid(115, 140, 500, 500)
 
 #Rate of change in relation to target between readings
 deceleratingBig = FuzzyTrapezoid(-20, -20, -10, -5)
-deceleratingSmall = FuzzyTriangle(-5, -2.5, 0)
-speedConstant = FuzzyTriangle(-1, 0, 1)
-acceleratingSmall = FuzzyTriangle(0, 2.5, 5)
+deceleratingSmall = FuzzyTriangle(-6, -3, 0)
+speedConstant = FuzzyTriangle(-5, 0, 5)
+acceleratingSmall = FuzzyTriangle(0, 3, 6)
 acceleratingBig = FuzzyTrapezoid(2.5, 10, 20, 20)
 
-BIG_SPEED_CHANGE = 30
-SMALL_SPEED_CHANGE = 15
+BIG_SPEED_CHANGE = 40
+SMALL_SPEED_CHANGE = 20
 NO_SPEED_CHANGE = 0
 
 POWER_LIMIT = 120
@@ -130,17 +130,31 @@ def callback(data):
 	closingSmall = acceleratingSmall.getMembership(deltaV)
 	closingBig = acceleratingBig.getMembership(deltaV)
 
+	print "closeBig:   ", closeBig
+	print "closeSmall: ", closeSmall
+	print "atTarget:   ", atTarget
+	print "farSmall:   ", farSmall
+	print "farBig:     ", farBig
+	print ""
+	print "expandingBig:   ", expandingBig
+	print "expandingSmall: ", expandingSmall
+	print "constantSpeed:  ", constantSpeed
+	print "closingSmall:   ", closingSmall
+	print "closingBig:     ", closingBig
+
 	memberships = []
-	if closeBig > 0: 
+	if closeBig > 0:		
 		if expandingBig > 0: memberships.append([(closeBig+expandingBig)/2, NO_SPEED_CHANGE])
 		if expandingSmall > 0: memberships.append([(closeBig+expandingSmall)/2, -BIG_SPEED_CHANGE])
 		if constantSpeed > 0: memberships.append([(closeBig+constantSpeed)/2, -BIG_SPEED_CHANGE])
 		if closingSmall > 0: memberships.append([(closeBig+closingSmall)/2, -BIG_SPEED_CHANGE])
 		if closingBig > 0: memberships.append([(closeBig+closingBig)/2, -BIG_SPEED_CHANGE])
 		
-	if (closeSmall > 0): 
-		if expandingBig > 0: memberships.append([(closeSmall+expandingBig)/2, SMALL_SPEED_CHANGE])
-		if expandingSmall > 0: memberships.append([(closeSmall+expandingSmall)/2, NO_SPEED_CHANGE])
+	if (closeSmall > 0):
+		#Changed from SMALL_SPEED_CHANGE
+		if expandingBig > 0: memberships.append([(closeSmall+expandingBig)/2, BIG_SPEED_CHANGE])
+		#Changed from NO_SPEED_CHANGE
+		if expandingSmall > 0: memberships.append([(closeSmall+expandingSmall)/2, SMALL_SPEED_CHANGE])
 		if constantSpeed > 0: memberships.append([(closeSmall+constantSpeed)/2, -SMALL_SPEED_CHANGE])
 		if closingSmall > 0: memberships.append([(closeSmall+closingSmall)/2, -SMALL_SPEED_CHANGE])
 		if closingBig > 0: memberships.append([(closeSmall+closingBig)/2, -BIG_SPEED_CHANGE])
@@ -156,7 +170,8 @@ def callback(data):
 		if expandingBig > 0: memberships.append([(farSmall+expandingBig)/2, BIG_SPEED_CHANGE])
 		if expandingSmall > 0: memberships.append([(farSmall+expandingSmall)/2, SMALL_SPEED_CHANGE])
 		if constantSpeed > 0: memberships.append([(farSmall+constantSpeed)/2, SMALL_SPEED_CHANGE])
-		if closingSmall > 0: memberships.append([(farSmall+closingSmall)/2, NO_SPEED_CHANGE])
+		#Changed from NO_SPEED_CHANGE
+		if closingSmall > 0: memberships.append([(farSmall+closingSmall)/2, -SMALL_SPEED_CHANGE])
 		if closingBig > 0: memberships.append([(farSmall+closingBig)/2, -BIG_SPEED_CHANGE])
 
 	if (farBig > 0): 
@@ -170,7 +185,7 @@ def callback(data):
 	areaSum = 0
 
 	for m in memberships:
-		m[0] = 30 * m[0] * (1 - (m[0]/2))
+		m[0] = 40 * m[0] * (1 - (m[0]/2))
 		weightedAreaSum += m[0] * m[1]
 		areaSum += m[0]
 

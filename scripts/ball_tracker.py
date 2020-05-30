@@ -20,7 +20,7 @@ def publishData(horizontalPos, size):
 
 try:
 	rospy.init_node('ball_tracker', anonymous=True)
-	pub = rospy.Publisher('/zumo/ball_pos', Int16MultiArray, queue_size=1)
+	pub = rospy.Publisher('/zumo/ball_pos', Int16MultiArray, queue_size=10)
 
 	#Capture default video stream
 	cap = cv2.VideoCapture(0)
