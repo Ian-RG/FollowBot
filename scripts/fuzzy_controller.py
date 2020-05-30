@@ -225,7 +225,7 @@ def adjustPowerForTurning(power, ballPosition, ballDimension):
 		turnRatio = weightedAreaSum / areaSum
 
 	#When reversing, the track opposite the turn needs to be slowed (ie slow the right track for a left turn when reversing)
-	leftPower, rightPower = power
+	leftPower = rightPower = power
 	if (turnRatio < 0):
 		if (power > 0): leftPower *= (-turnRatio)
 		else: rightPower *= (-turnRatio)
