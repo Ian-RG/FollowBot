@@ -53,11 +53,11 @@ acceleratingSmallFn = FuzzyTriangle(0, 3, 6)
 acceleratingBigFn = FuzzyTrapezoid(2.5, 10, 20, 20)
 
 #Ball position relative to centre of frame
-leftBigFn = FuzzyTrapezoid(-100, -100, 30, 150)
-leftSmallFn = FuzzyTriangle(130, 210, 290)
-centreFn = FuzzyTriangle(280, 300, 320)
-rightSmallFn = FuzzyTriangle(310, 390, 470)
-rightBigFn = FuzzyTrapezoid(450, 570, 1000, 1000)
+leftBigFn = FuzzyTrapezoid(-100, -100, 100, 200)
+leftSmallFn = FuzzyTriangle(100, 200, 300)
+centreFn = FuzzyTriangle(250, 300, 350)
+rightSmallFn = FuzzyTriangle(300, 400, 500)
+rightBigFn = FuzzyTrapezoid(400, 500, 1000, 1000)
 
 BIG_SPEED_CHANGE = 40
 SMALL_SPEED_CHANGE = 20
@@ -217,7 +217,7 @@ def adjustPowerForTurning(power, ballPosition, ballDimension):
 	turnRatio = 0
 
 	for m in memberships:
-		m[0] = 40 * m[0] * (1 - (m[0]/2))
+		m[0] = 1 * m[0] * (1 - (m[0]/2))
 		weightedAreaSum += m[0] * m[1]
 		areaSum += m[0]
 
