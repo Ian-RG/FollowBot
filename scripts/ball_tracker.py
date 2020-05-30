@@ -49,8 +49,8 @@ try:
 	stamp = int(round(time.time() * 1000))
 
 	while True:
-		#if not int(round(time.time() * 1000)) >= stamp:
-			#continue
+		if not int(round(time.time() * 1000)) >= stamp:
+			continue
 		print "Time:  ", int(round(time.time() * 1000))
 		print "Stamp: ", stamp		
 
@@ -116,8 +116,3 @@ try:
 except KeyboardInterrupt:
 	cap.release()
 	cv2.destroyAllWindows()
-
-	
-
-
-	
