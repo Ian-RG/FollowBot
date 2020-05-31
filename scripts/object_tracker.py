@@ -1,38 +1,43 @@
 #!/usr/bin/env python
 
 import rospy
-from std_msgs.msg import Int16MultiArray
+from std_msgs.msg import Int16MultiArray, Int16
 import cv2
 import numpy as np
 import time
 
-#55 at 50cm
-#Ball is 90 pixels wide at 30cm
-#210 at 10cm
-#centre is 300
-
-def publishBallData(horizontalPos, size):
+def publishObjectData(horizontalPos, size):
 	#print("Size: {}", size)
 	#print("Pos: {}", horizontalPos)
 	global stampId
 	stampId += 1
-	print stampId, " Published from tracker at: ", int(round(time.time() * 1000))
+	#print stampId, " Published from tracker at: ", int(round(time.time() * 1000))
 	data = Int16MultiArray()
 	data.data = [horizontalPos, size]
-	ballPub.publish(data)
+	objectPub.publish(data)
+
+def publishNewObject(size):
+	data = Int16()
+	data.data = size
+	newObjectPub.publish(data)
 
 def publishPowerData():
 	data = Int16MultiArray()
 	data.data = [0, 0]
 	powerPub.publish(data)
 
+def startNewObject(x):
+	global newObject
+	newObject = True
+
 def nothing(x):
 	pass
 
 try:
-	rospy.init_node('ball_tracker', anonymous=True)
-	ballPub = rospy.Publisher('/zumo/ball_pos', Int16MultiArray, queue_size=1)
-	powerPub = rospy.Publisher('/zumo/power', Int16MultiArray, queue_size=5)
+	rospy.init_node('object_tracker', anonymous=True)
+	objectPub = rospy.Publisher('/zumo/object_data', Int16MultiArray, queue_size=1)
+	powerPub = rospy.Publisher('/zumo/power', Int16MultiArray, queue_size=1)
+	newObjectPub = rospy.Publisher('/zumo/new_object', Int16, queue_size=1)
 
 	#Capture default video stream
 	cap = cv2.VideoCapture(0)
@@ -47,11 +52,12 @@ try:
 	cv2.createTrackbar("Upper Value", "Tracking", 255, 255, nothing)
 
 	trackingTitle = "Tracking:\n0 - Off\n1 - On"
-	cv2.createTrackbar(trackingTitle, "Tracking", 0, 1, nothing)
+	cv2.createTrackbar(trackingTitle, "Tracking", 0, 1, startNewObject)
 
 	stamp = int(round(time.time() * 1000))
-
 	stampId = 0
+
+	newObject = True
 
 	while True:
 		if not int(round(time.time() * 1000)) >= stamp:
@@ -97,12 +103,13 @@ try:
 
 			if (isTracking == 1):
 				horizontalPos = (left+right)/2.0
-				#Use the longest visible side as the measure of distance
-				#We're chasing a ball, so ideally the shape will be a square.
-				#If it's partially off-camera, using the larger value will help avoid collision
+				#Use the longest visible side as the measure of distance, using the larger value will help avoid collision
 				size = max(left-right, lower-upper)
-				print "Size: ", size, " Position: ", horizontalPos
-				publishBallData(horizontalPos, size)
+				#print "Size: ", size, " Position: ", horizontalPos
+				if (newObject):
+					publishNewObject(size)
+					newObject = False
+				publishObjectData(horizontalPos, size)
 		
 		stack = np.hstack((frame, result))
 		#Display outputs

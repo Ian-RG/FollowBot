@@ -2,7 +2,7 @@
    <node pkg="rosserial_python" type="serial_node.py" name="rosserial" output="screen">
     <param name="port" value="/dev/ttyACM0"/>
     </node>
-   <node pkg="project" type="ball_tracker.py" name="ball_tracker" output="screen"></node>
+   <node pkg="project" type="object_tracker.py" name="object_tracker" output="screen"></node>
    <node pkg="project" type="fuzzy_power_controller.py" name="fuzzy_power_controller" output="screen"></node>
    <node pkg="project" type="fuzzy_steering_controller.py" name="fuzzy_steering_controller" output="screen"></node>
 </launch>

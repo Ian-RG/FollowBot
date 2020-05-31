@@ -2,18 +2,19 @@
 from __future__ import division
 import time
 import rospy
-from std_msgs.msg import Int16MultiArray
+from std_msgs.msg import Int16MultiArray, Int16
 from fuzzy_functions import FuzzyTrapezoid, FuzzyTriangle
 
 rospy.init_node('fuzzy_power_controller', anonymous=True)
 pub = rospy.Publisher('/zumo/raw_power', Int16MultiArray, queue_size = 1)
 
+
 #Size of target
-targetUndersizeBigFn = FuzzyTrapezoid(0, 0, 50, 70)
-targetUndersizeSmallFn = FuzzyTriangle(50, 70, 90)
-targetIdealSizeFn = FuzzyTriangle(70, 90, 110)
-targetOversizeSmallFn = FuzzyTriangle(90, 110, 130)
-targetOversizeBigFn = FuzzyTrapezoid(110, 130, 500, 500)
+targetUndersizeBigFn = FuzzyTrapezoid(0, 0, 0, 0)
+targetUndersizeSmallFn = FuzzyTriangle(0, 0, 0)
+targetIdealSizeFn = FuzzyTriangle(0, 0, 0)
+targetOversizeSmallFn = FuzzyTriangle(0, 0, 0)
+targetOversizeBigFn = FuzzyTrapezoid(0, 0, 0, 0)
 
 #Rate of change in relation to target between readings
 deceleratingBigFn = FuzzyTrapezoid(-200, -200, -2, -1)
@@ -28,24 +29,24 @@ NO_SPEED_CHANGE = 0
 POWER_LIMIT = 120
 
 power = 0
-previousBallDimension = 0
+previousObjectDimension = 0
 
 stampId = 0
 
-def publishData(power, ballPosition, ballDimension):
+def publishData(power, objectPosition, objectDimension):
 	global stampId
 	stampId += 1
-	print stampId, " Published from power at: ", int(round(time.time() * 1000))
+	#print stampId, " Published from power at: ", int(round(time.time() * 1000))
 	data = Int16MultiArray()
-	data.data = [ballPosition, ballDimension, power]
+	data.data = [objectPosition, objectDimension, power]
 	pub.publish(data)
 
-def getPower(power, ballDimension, deltaV):
-	closeBig = targetOversizeBigFn.getMembership(ballDimension)
-	closeSmall = targetOversizeSmallFn.getMembership(ballDimension)
-	atTarget = targetIdealSizeFn.getMembership(ballDimension)
-	farSmall = targetUndersizeSmallFn.getMembership(ballDimension)
-	farBig = targetUndersizeBigFn.getMembership(ballDimension)
+def getPower(power, objectDimension, deltaV):
+	closeBig = targetOversizeBigFn.getMembership(objectDimension)
+	closeSmall = targetOversizeSmallFn.getMembership(objectDimension)
+	atTarget = targetIdealSizeFn.getMembership(objectDimension)
+	farSmall = targetUndersizeSmallFn.getMembership(objectDimension)
+	farBig = targetUndersizeBigFn.getMembership(objectDimension)
 
 	deceleratingBig = deceleratingBigFn.getMembership(deltaV)
 	deceleratingSmall = deceleratingSmallFn.getMembership(deltaV)
@@ -122,23 +123,33 @@ def getPower(power, ballDimension, deltaV):
 	return power
 
 
-def callback(data):
+def objectDataCallback(data):
 	global power
-	global previousBallDimension
-	ballPosition = data.data[0]
-	ballDimension = data.data[1]
+	global previousObjectDimension
+	objectPosition = data.data[0]
+	objectDimension = data.data[1]
 	#Change in velocity relative to target
-	deltaV = ballDimension - previousBallDimension
-	print deltaV
+	deltaV = objectDimension - previousObjectDimension
+	#print deltaV
 
-	power = getPower(power, ballDimension, deltaV)
+	power = getPower(power, objectDimension, deltaV)
 
-	#print "Ball position: ", ballPosition, " Ball dimension: ", ballDimension, "Power: ", power
-	publishData(power, ballPosition, ballDimension)
-	previousBallDimension = ballDimension
+	#print "Object position: ", objectPosition, " Object dimension: ", objectDimension, "Power: ", power
+	publishData(power, objectPosition, objectDimension)
+	previousObjectDimension = objectDimension
+
+def newObjectCallback(data):
+	width = data.data
+	global targetUndersizeBigFn, targetUndersizeSmallFn, targetIdealSizeFn, targetOversizeSmallFn, targetOversizeSmallFn
+	targetUndersizeBigFn = FuzzyTrapezoid(0, 0, width*0.55, width*0.8)
+	targetUndersizeSmallFn = FuzzyTriangle(width*0.55, width*0.8, width)
+	targetIdealSizeFn = FuzzyTriangle(width*0.8, width, width*1.2)
+	targetOversizeSmallFn = FuzzyTriangle(width, width*1.2, width*1.45)
+	targetOversizeBigFn = FuzzyTrapezoid(width*1.2, width*1.45, 1000, 1000)
 
 def listener():
-	rospy.Subscriber('/zumo/ball_pos', Int16MultiArray, callback)
+	rospy.Subscriber('/zumo/object_data', Int16MultiArray, objectDataCallback)
+	rospy.Subscriber('/zumo/new_object', Int16, newObjectCallback)
 	rospy.spin()
 
 if __name__ == '__main__':
