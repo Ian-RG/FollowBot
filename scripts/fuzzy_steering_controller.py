@@ -10,11 +10,11 @@ rospy.init_node('fuzzy_steering_controller', anonymous=True)
 pub = rospy.Publisher('/zumo/power', Int16MultiArray, queue_size = 1)
 
 #Size of target
-targetUndersizeBigFn = FuzzyTrapezoid(0, 0, 65, 80)
-targetUndersizeSmallFn = FuzzyTriangle(65, 80, 90)
-targetIdealSizeFn = FuzzyTriangle(80, 90, 100)
-targetOversizeSmallFn = FuzzyTriangle(90, 100, 120)
-targetOversizeBigFn = FuzzyTrapezoid(100, 120, 500, 500)
+targetUndersizeBigFn = FuzzyTrapezoid(0, 0, 50, 70)
+targetUndersizeSmallFn = FuzzyTriangle(50, 70, 90)
+targetIdealSizeFn = FuzzyTriangle(70, 90, 110)
+targetOversizeSmallFn = FuzzyTriangle(90, 110, 130)
+targetOversizeBigFn = FuzzyTrapezoid(110, 130, 500, 500)
 
 #Ball position relative to centre of frame
 leftBigFn = FuzzyTrapezoid(-100, -100, 100, 200)
