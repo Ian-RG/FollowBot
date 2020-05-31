@@ -18,11 +18,11 @@ targetOversizeBigFn = FuzzyTrapezoid(110, 130, 500, 500)
 #Rate of change in relation to target between readings
 deceleratingBigFn = FuzzyTrapezoid(-200, -200, -2, -1)
 deceleratingSmallFn = FuzzyTriangle(-2, -1, 0)
-speedConstantFn = FuzzyTriangle(-1, 0, 2)
-acceleratingSmallFn = FuzzyTriangle(0, 2, 4)
-acceleratingBigFn = FuzzyTrapezoid(2, 4, 200, 200)
+speedConstantFn = FuzzyTriangle(-1, 0, 1)
+acceleratingSmallFn = FuzzyTriangle(0, 1, 2)
+acceleratingBigFn = FuzzyTrapezoid(1, 2, 200, 200)
 
-BIG_SPEED_CHANGE = 16
+BIG_SPEED_CHANGE = 6
 SMALL_SPEED_CHANGE = 3
 NO_SPEED_CHANGE = 0
 POWER_LIMIT = 120
