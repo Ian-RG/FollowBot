@@ -9,21 +9,21 @@ rospy.init_node('fuzzy_power_controller', anonymous=True)
 pub = rospy.Publisher('/zumo/raw_power', Int16MultiArray, queue_size = 1)
 
 #Size of target
-targetUndersizeBigFn = FuzzyTrapezoid(0, 0, 60, 70)
-targetUndersizeSmallFn = FuzzyTriangle(65, 80, 90)
-targetIdealSizeFn = FuzzyTriangle(85, 90, 100)
-targetOversizeSmallFn = FuzzyTriangle(90, 105, 120)
-targetOversizeBigFn = FuzzyTrapezoid(115, 140, 500, 500)
+targetUndersizeBigFn = FuzzyTrapezoid(0, 0, 50, 70)
+targetUndersizeSmallFn = FuzzyTriangle(50, 70, 90)
+targetIdealSizeFn = FuzzyTriangle(70, 90, 110)
+targetOversizeSmallFn = FuzzyTriangle(90, 110, 140)
+targetOversizeBigFn = FuzzyTrapezoid(110, 140, 500, 500)
 
 #Rate of change in relation to target between readings
-deceleratingBigFn = FuzzyTrapezoid(-200, -200, -10, -5)
-deceleratingSmallFn = FuzzyTriangle(-10, -5, 0)
-speedConstantFn = FuzzyTriangle(-5, 0, 5)
-acceleratingSmallFn = FuzzyTriangle(0, 5, 10)
-acceleratingBigFn = FuzzyTrapezoid(5, 10, 200, 200)
+deceleratingBigFn = FuzzyTrapezoid(-200, -200, -2, -1)
+deceleratingSmallFn = FuzzyTriangle(-2, -1, 0)
+speedConstantFn = FuzzyTriangle(-1, 0, 2)
+acceleratingSmallFn = FuzzyTriangle(0, 2, 4)
+acceleratingBigFn = FuzzyTrapezoid(2, 4, 200, 200)
 
-BIG_SPEED_CHANGE = 20
-SMALL_SPEED_CHANGE = 10
+BIG_SPEED_CHANGE = 16
+SMALL_SPEED_CHANGE = 3
 NO_SPEED_CHANGE = 0
 POWER_LIMIT = 120
 
@@ -53,17 +53,17 @@ def getPower(power, ballDimension, deltaV):
 	acceleratingSmall = acceleratingSmallFn.getMembership(deltaV)
 	acceleratingBig = acceleratingBigFn.getMembership(deltaV)
 
-	print "closeBig:   ", closeBig
-	print "closeSmall: ", closeSmall
-	print "atTarget:   ", atTarget
-	print "farSmall:   ", farSmall
-	print "farBig:     ", farBig
-	print ""
-	print "deceleratingBig:   ", deceleratingBig
-	print "deceleratingSmall: ", deceleratingSmall
-	print "speedConstant:  ", speedConstant
-	print "acceleratingSmall:   ", acceleratingSmall
-	print "acceleratingBig:     ", acceleratingBig
+	#print "closeBig:   ", closeBig
+	#print "closeSmall: ", closeSmall
+	#print "atTarget:   ", atTarget
+	#print "farSmall:   ", farSmall
+	#print "farBig:     ", farBig
+	#print ""
+	#print "deceleratingBig:   ", deceleratingBig
+	#print "deceleratingSmall: ", deceleratingSmall
+	#print "speedConstant:  ", speedConstant
+	#print "acceleratingSmall:   ", acceleratingSmall
+	#print "acceleratingBig:     ", acceleratingBig
 
 	memberships = []
 	if closeBig > 0:		
@@ -74,7 +74,7 @@ def getPower(power, ballDimension, deltaV):
 		if acceleratingBig > 0: memberships.append([(closeBig+acceleratingBig)/2, -BIG_SPEED_CHANGE])
 		
 	if (closeSmall > 0):
-		if deceleratingBig > 0: memberships.append([(closeSmall+deceleratingBig)/2,SMALL_SPEED_CHANGE])
+		if deceleratingBig > 0: memberships.append([(closeSmall+deceleratingBig)/2, SMALL_SPEED_CHANGE])
 		if deceleratingSmall > 0: memberships.append([(closeSmall+deceleratingSmall)/2, NO_SPEED_CHANGE])
 		if speedConstant > 0: memberships.append([(closeSmall+speedConstant)/2, -SMALL_SPEED_CHANGE])
 		if acceleratingSmall > 0: memberships.append([(closeSmall+acceleratingSmall)/2, -BIG_SPEED_CHANGE])
@@ -105,17 +105,14 @@ def getPower(power, ballDimension, deltaV):
 	areaSum = 0
 
 	for m in memberships:
-		m[0] = 20 * m[0] * (1 - (m[0]/2))
+		m[0] = 6 * m[0] * (1 - (m[0]/2))
 		weightedAreaSum += m[0] * m[1]
 		areaSum += m[0]
 
 	if (areaSum != 0):
 		powerChange = weightedAreaSum / areaSum
-		print "Powerchange: ", powerChange
+		#print "Powerchange: ", powerChange
 		power += powerChange
-	else:
-		print "Areasum zero!"
-		print "Target size: ", ballDimension
 		
 
 	if (power > POWER_LIMIT):
@@ -132,6 +129,7 @@ def callback(data):
 	ballDimension = data.data[1]
 	#Change in velocity relative to target
 	deltaV = ballDimension - previousBallDimension
+	print deltaV
 
 	power = getPower(power, ballDimension, deltaV)
 

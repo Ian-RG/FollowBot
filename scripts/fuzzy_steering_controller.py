@@ -10,11 +10,11 @@ rospy.init_node('fuzzy_steering_controller', anonymous=True)
 pub = rospy.Publisher('/zumo/power', Int16MultiArray, queue_size = 1)
 
 #Size of target
-targetUndersizeBigFn = FuzzyTrapezoid(0, 0, 60, 70)
+targetUndersizeBigFn = FuzzyTrapezoid(0, 0, 65, 80)
 targetUndersizeSmallFn = FuzzyTriangle(65, 80, 90)
-targetIdealSizeFn = FuzzyTriangle(85, 90, 100)
-targetOversizeSmallFn = FuzzyTriangle(90, 105, 120)
-targetOversizeBigFn = FuzzyTrapezoid(115, 140, 500, 500)
+targetIdealSizeFn = FuzzyTriangle(80, 90, 100)
+targetOversizeSmallFn = FuzzyTriangle(90, 100, 120)
+targetOversizeBigFn = FuzzyTrapezoid(100, 120, 500, 500)
 
 #Ball position relative to centre of frame
 leftBigFn = FuzzyTrapezoid(-100, -100, 100, 200)
@@ -24,9 +24,13 @@ rightSmallFn = FuzzyTriangle(300, 400, 500)
 rightBigFn = FuzzyTrapezoid(400, 500, 1000, 1000)
 
 HARD_TURN_LEFT = -1
-SOFT_TURN_LEFT = -0.5
+MED_HARD_TURN_LEFT = -0.75
+MED_SOFT_TURN_LEFT = -0.5
+SOFT_TURN_LEFT = -0.25
 NO_TURN = 0
-SOFT_TURN_RIGHT = 0.5
+SOFT_TURN_RIGHT = 0.25
+MED_SOFT_TURN_RIGHT = 0.5
+MED_HARD_TURN_RIGHT = 0.75
 HARD_TURN_RIGHT = 1
 
 stampId = 0
@@ -55,32 +59,32 @@ def adjustPowerForTurning(power, ballPosition, ballDimension):
 
 	memberships = []
 	if closeBig > 0:		
-		if rightBig > 0: memberships.append([(closeBig+rightBig)/2, HARD_TURN_RIGHT])
-		if rightSmall > 0: memberships.append([(closeBig+rightSmall)/2, SOFT_TURN_RIGHT])
+		if rightBig > 0: memberships.append([(closeBig+rightBig)/2, MED_HARD_TURN_RIGHT])
+		if rightSmall > 0: memberships.append([(closeBig+rightSmall)/2, MED_HARD_TURN_RIGHT])
 		if centre > 0: memberships.append([(closeBig+centre)/2, NO_TURN])
-		if leftSmall > 0: memberships.append([(closeBig+leftSmall)/2, SOFT_TURN_LEFT])
-		if leftBig > 0: memberships.append([(closeBig+leftBig)/2, SOFT_TURN_LEFT])
+		if leftSmall > 0: memberships.append([(closeBig+leftSmall)/2, MED_HARD_TURN_LEFT])
+		if leftBig > 0: memberships.append([(closeBig+leftBig)/2, MED_HARD_TURN_LEFT])
 		
 	if (closeSmall > 0):
-		if rightBig > 0: memberships.append([(closeSmall+rightBig)/2, SOFT_TURN_RIGHT])
-		if rightSmall > 0: memberships.append([(closeSmall+rightSmall)/2, SOFT_TURN_RIGHT])
+		if rightBig > 0: memberships.append([(closeSmall+rightBig)/2, MED_HARD_TURN_RIGHT])
+		if rightSmall > 0: memberships.append([(closeSmall+rightSmall)/2, MED_SOFT_TURN_RIGHT])
 		if centre > 0: memberships.append([(closeSmall+centre)/2, NO_TURN])
-		if leftSmall > 0: memberships.append([(closeSmall+leftSmall)/2, SOFT_TURN_LEFT])
-		if leftBig > 0: memberships.append([(closeSmall+leftBig)/2, SOFT_TURN_LEFT])
+		if leftSmall > 0: memberships.append([(closeSmall+leftSmall)/2, MED_HARD_TURN_LEFT])
+		if leftBig > 0: memberships.append([(closeSmall+leftBig)/2, MED_SOFT_TURN_LEFT])
 
 	if (atTarget > 0): 
-		if rightBig > 0: memberships.append([(atTarget+rightBig)/2, SOFT_TURN_RIGHT])
-		if rightSmall > 0: memberships.append([(atTarget+rightSmall)/2, SOFT_TURN_RIGHT])
+		if rightBig > 0: memberships.append([(atTarget+rightBig)/2, MED_HARD_TURN_RIGHT])
+		if rightSmall > 0: memberships.append([(atTarget+rightSmall)/2, MED_SOFT_TURN_RIGHT])
 		if centre > 0: memberships.append([(atTarget+centre)/2, NO_TURN])
-		if leftSmall > 0: memberships.append([(atTarget+leftSmall)/2, SOFT_TURN_LEFT])
-		if leftBig > 0: memberships.append([(atTarget+leftBig)/2, SOFT_TURN_LEFT])
+		if leftSmall > 0: memberships.append([(atTarget+leftSmall)/2, MED_SOFT_TURN_LEFT])
+		if leftBig > 0: memberships.append([(atTarget+leftBig)/2, MED_HARD_TURN_LEFT])
 
 	if (farSmall > 0): 
-		if rightBig > 0: memberships.append([(farSmall+rightBig)/2, SOFT_TURN_RIGHT])
+		if rightBig > 0: memberships.append([(farSmall+rightBig)/2, MED_SOFT_TURN_RIGHT])
 		if rightSmall > 0: memberships.append([(farSmall+rightSmall)/2, SOFT_TURN_RIGHT])
 		if centre > 0: memberships.append([(farSmall+centre)/2, NO_TURN])
 		if leftSmall > 0: memberships.append([(farSmall+leftSmall)/2, SOFT_TURN_LEFT])
-		if leftBig > 0: memberships.append([(farSmall+leftBig)/2, SOFT_TURN_LEFT])
+		if leftBig > 0: memberships.append([(farSmall+leftBig)/2, MED_SOFT_TURN_LEFT])
 
 	if (farBig > 0): 
 		if rightBig > 0: memberships.append([(farBig+rightBig)/2, SOFT_TURN_RIGHT])
@@ -95,7 +99,7 @@ def adjustPowerForTurning(power, ballPosition, ballDimension):
 	turnRatio = 0
 
 	for m in memberships:
-		m[0] = 1 * m[0] * (1 - (m[0]/2))
+		m[0] = 0.5 * m[0] * (1 - (m[0]/2))
 		weightedAreaSum += m[0] * m[1]
 		areaSum += m[0]
 

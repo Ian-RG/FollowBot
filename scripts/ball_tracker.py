@@ -62,10 +62,10 @@ try:
 		_, frame = cap.read()
 
 		#Blur image
-		blurred = cv2.GaussianBlur(frame, (9, 9), cv2.BORDER_DEFAULT)
+		#blurred = cv2.GaussianBlur(frame, (9, 9), cv2.BORDER_DEFAULT)
 
 		#Convert BGR image to HSV
-		hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
+		hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
 		lowerHue = cv2.getTrackbarPos("Lower Hue", "Tracking")
 		upperHue = cv2.getTrackbarPos("Upper Hue", "Tracking")
@@ -112,7 +112,7 @@ try:
 			break
 
 		#Add 200 ms to timestamp, running loop 5 times per second
-		stamp += 200
+		stamp += 100
 
 		#If tracking is off, send 0 power values to the zumo		
 		if isTracking == 0:

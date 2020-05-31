@@ -38,5 +38,5 @@ void loop()
 {
   updateTrackPower();
   nh.spinOnce();
-  delay(200);
+  delay(50);
 }
