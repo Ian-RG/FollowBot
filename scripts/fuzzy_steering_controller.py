@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 from __future__ import division
-from time import sleep
+import time
 import rospy
 from std_msgs.msg import Int16, Int16MultiArray
 from fuzzy_functions import FuzzyTrapezoid, FuzzyTriangle
 
 
 rospy.init_node('fuzzy_steering_controller', anonymous=True)
-pub = rospy.Publisher('/zumo/power', Int16MultiArray, queue_size = 10)
+pub = rospy.Publisher('/zumo/power', Int16MultiArray, queue_size = 1)
 
 #Size of target
 targetUndersizeBigFn = FuzzyTrapezoid(0, 0, 60, 70)
@@ -29,7 +29,12 @@ NO_TURN = 0
 SOFT_TURN_RIGHT = 0.5
 HARD_TURN_RIGHT = 1
 
+stampId = 0
+
 def publishData(leftPower, rightPower):
+	global stampId
+	stampId += 1
+	print stampId, " Published from steering at: ", int(round(time.time() * 1000))
 	data = Int16MultiArray()
 	data.data = [leftPower, rightPower]
 	pub.publish(data)
@@ -72,16 +77,16 @@ def adjustPowerForTurning(power, ballPosition, ballDimension):
 
 	if (farSmall > 0): 
 		if rightBig > 0: memberships.append([(farSmall+rightBig)/2, SOFT_TURN_RIGHT])
-		if rightSmall > 0: memberships.append([(farSmall+rightSmall)/2, NO_TURN])
+		if rightSmall > 0: memberships.append([(farSmall+rightSmall)/2, SOFT_TURN_RIGHT])
 		if centre > 0: memberships.append([(farSmall+centre)/2, NO_TURN])
-		if leftSmall > 0: memberships.append([(farSmall+leftSmall)/2, NO_TURN])
+		if leftSmall > 0: memberships.append([(farSmall+leftSmall)/2, SOFT_TURN_LEFT])
 		if leftBig > 0: memberships.append([(farSmall+leftBig)/2, SOFT_TURN_LEFT])
 
 	if (farBig > 0): 
 		if rightBig > 0: memberships.append([(farBig+rightBig)/2, SOFT_TURN_RIGHT])
-		if rightSmall > 0: memberships.append([(farBig+rightSmall)/2, NO_TURN])
+		if rightSmall > 0: memberships.append([(farBig+rightSmall)/2, SOFT_TURN_RIGHT])
 		if centre > 0: memberships.append([(farBig+centre)/2, NO_TURN])
-		if leftSmall > 0: memberships.append([(farBig+leftSmall)/2, NO_TURN])
+		if leftSmall > 0: memberships.append([(farBig+leftSmall)/2, SOFT_TURN_LEFT])
 		if leftBig > 0: memberships.append([(farBig+leftBig)/2, SOFT_TURN_LEFT])
 
 	weightedAreaSum = 0
@@ -114,7 +119,7 @@ def adjustPowerForTurning(power, ballPosition, ballDimension):
 def callback(data):
 	ballPosition = data.data[0]
 	ballDimension = data.data[1]
-    power = data.data[2]
+	power = data.data[2]
 
 	leftPower, rightPower = adjustPowerForTurning(power, ballPosition, ballDimension)
 
@@ -122,7 +127,7 @@ def callback(data):
 	publishData(leftPower, rightPower)
 
 def listener():
-	rospy.Subscriber('/zumo/fuzzy_power_controller', Int16MultiArray, callback)
+	rospy.Subscriber('/zumo/raw_power', Int16MultiArray, callback)
 	rospy.spin()
 
 if __name__ == '__main__':

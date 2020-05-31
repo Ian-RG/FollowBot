@@ -6,18 +6,19 @@ const int motorDirLeftPin = 8;
 const int motorPowerRightPin = 9;
 const int motorPowerLeftPin = 10;
 
-void rosHandler(const std_msgs::Int16MultiArray& msg) {
-  int left = msg.data[0];
-  int right = msg.data[1];
+int leftPower = 0;
+int rightPower = 0;
 
-  changeTrackPower(left, right);
+void rosHandler(const std_msgs::Int16MultiArray& msg) {
+  leftPower = msg.data[0];
+  rightPower = msg.data[1];
 }
 
-void changeTrackPower(int left, int right) {
-  digitalWrite(motorDirLeftPin, left > 0 ? LOW : HIGH);
-  analogWrite(motorPowerLeftPin, abs(left));
-  digitalWrite(motorDirRightPin, right > 0 ? LOW : HIGH);
-  analogWrite(motorPowerRightPin, abs(right));
+void updateTrackPower() {
+  digitalWrite(motorDirLeftPin, leftPower > 0 ? LOW : HIGH);
+  analogWrite(motorPowerLeftPin, abs(leftPower));
+  digitalWrite(motorDirRightPin, rightPower > 0 ? LOW : HIGH);
+  analogWrite(motorPowerRightPin, abs(rightPower));
 }
 
 ros::NodeHandle nh;
@@ -35,6 +36,7 @@ void setup() {
 
 void loop()
 {
+  updateTrackPower();
   nh.spinOnce();
-  delay(1);
+  delay(200);
 }

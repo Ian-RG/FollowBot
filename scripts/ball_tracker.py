@@ -14,6 +14,9 @@ import time
 def publishBallData(horizontalPos, size):
 	#print("Size: {}", size)
 	#print("Pos: {}", horizontalPos)
+	global stampId
+	stampId += 1
+	print stampId, " Published from tracker at: ", int(round(time.time() * 1000))
 	data = Int16MultiArray()
 	data.data = [horizontalPos, size]
 	ballPub.publish(data)
@@ -28,7 +31,7 @@ def nothing(x):
 
 try:
 	rospy.init_node('ball_tracker', anonymous=True)
-	ballPub = rospy.Publisher('/zumo/ball_pos', Int16MultiArray, queue_size=10)
+	ballPub = rospy.Publisher('/zumo/ball_pos', Int16MultiArray, queue_size=1)
 	powerPub = rospy.Publisher('/zumo/power', Int16MultiArray, queue_size=5)
 
 	#Capture default video stream
@@ -48,11 +51,13 @@ try:
 
 	stamp = int(round(time.time() * 1000))
 
+	stampId = 0
+
 	while True:
 		if not int(round(time.time() * 1000)) >= stamp:
 			continue
-		print "Time:  ", int(round(time.time() * 1000))
-		print "Stamp: ", stamp		
+		#print "Time:  ", int(round(time.time() * 1000))
+		#print "Stamp: ", stamp		
 
 		_, frame = cap.read()
 
@@ -96,6 +101,7 @@ try:
 				#We're chasing a ball, so ideally the shape will be a square.
 				#If it's partially off-camera, using the larger value will help avoid collision
 				size = max(left-right, lower-upper)
+				print "Size: ", size, " Position: ", horizontalPos
 				publishBallData(horizontalPos, size)
 		
 		stack = np.hstack((frame, result))

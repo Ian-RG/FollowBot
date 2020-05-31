@@ -1,3 +1,5 @@
+from __future__ import division
+
 class FuzzyTriangle:
 	def __init__(self, left, middle, right):
 		self.left = left
