@@ -12,8 +12,8 @@ pub = rospy.Publisher('/zumo/raw_power', Int16MultiArray, queue_size = 1)
 targetUndersizeBigFn = FuzzyTrapezoid(0, 0, 50, 70)
 targetUndersizeSmallFn = FuzzyTriangle(50, 70, 90)
 targetIdealSizeFn = FuzzyTriangle(70, 90, 110)
-targetOversizeSmallFn = FuzzyTriangle(90, 110, 140)
-targetOversizeBigFn = FuzzyTrapezoid(110, 140, 500, 500)
+targetOversizeSmallFn = FuzzyTriangle(90, 110, 130)
+targetOversizeBigFn = FuzzyTrapezoid(110, 130, 500, 500)
 
 #Rate of change in relation to target between readings
 deceleratingBigFn = FuzzyTrapezoid(-200, -200, -2, -1)
