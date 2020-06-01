@@ -69,8 +69,8 @@ try:
 
 		_, frame = cap.read()
 
-		#Blur image
-		#blurred = cv2.GaussianBlur(frame, (9, 9), cv2.BORDER_DEFAULT)
+		#Blur image: This was too computationally expensive on the pi to run at a useful level. 
+		#blurred = cv2.GaussianBlur(frame, (25, 25), cv2.BORDER_DEFAULT)
 
 		#Convert BGR image to HSV
 		hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
@@ -106,7 +106,7 @@ try:
 			if (isTracking == 1):
 				horizontalPos = (left+right)/2.0
 				#Use the longest visible side as the measure of distance, using the larger value will help avoid collision
-				size = max(left-right, lower-upper)
+				size = max(right-left, lower-upper)
 				#print "Size: ", size, " Position: ", horizontalPos
 				if (newObject):
 					publishNewObject(size)
@@ -120,7 +120,7 @@ try:
 		if key == 27:
 			break
 
-		#Add 200 ms to timestamp, running loop 5 times per second
+		#Add 100 ms to timestamp, running loop 10 times per second
 		stamp += 100
 
 		#If tracking is off, send 0 power values to the zumo		
