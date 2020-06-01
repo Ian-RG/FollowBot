@@ -17,11 +17,11 @@ targetOversizeSmallFn = FuzzyTriangle(0, 0, 0)
 targetOversizeBigFn = FuzzyTrapezoid(0, 0, 0, 0)
 
 #Rate of change in relation to target between readings
-deceleratingBigFn = FuzzyTrapezoid(-200, -200, -2, -1)
-deceleratingSmallFn = FuzzyTriangle(-2, -1, 0)
+deceleratingBigFn = FuzzyTrapezoid(-200, -200, -3, -1)
+deceleratingSmallFn = FuzzyTriangle(-3, -1, 0)
 speedConstantFn = FuzzyTriangle(-1, 0, 1)
-acceleratingSmallFn = FuzzyTriangle(0, 1, 2)
-acceleratingBigFn = FuzzyTrapezoid(1, 2, 200, 200)
+acceleratingSmallFn = FuzzyTriangle(0, 1, 3)
+acceleratingBigFn = FuzzyTrapezoid(1, 3, 200, 200)
 
 BIG_SPEED_CHANGE = 6
 SMALL_SPEED_CHANGE = 3
@@ -64,7 +64,7 @@ def getPower(power, objectDimension, deltaV):
 	#print "deceleratingSmall: ", deceleratingSmall
 	#print "speedConstant:  ", speedConstant
 	#print "acceleratingSmall:   ", acceleratingSmall
-	#print "acceleratingBig:     ", acceleratingBig
+	#print "acceleratingBig:     ", acceleratingBig	
 
 	memberships = []
 	if closeBig > 0:		
@@ -139,13 +139,13 @@ def objectDataCallback(data):
 	previousObjectDimension = objectDimension
 
 def newObjectCallback(data):
+	#print "New Object in power!"
 	width = data.data
-	global targetUndersizeBigFn, targetUndersizeSmallFn, targetIdealSizeFn, targetOversizeSmallFn, targetOversizeSmallFn
-	targetUndersizeBigFn = FuzzyTrapezoid(0, 0, width*0.55, width*0.8)
-	targetUndersizeSmallFn = FuzzyTriangle(width*0.55, width*0.8, width)
-	targetIdealSizeFn = FuzzyTriangle(width*0.8, width, width*1.2)
-	targetOversizeSmallFn = FuzzyTriangle(width, width*1.2, width*1.45)
-	targetOversizeBigFn = FuzzyTrapezoid(width*1.2, width*1.45, 1000, 1000)
+	targetUndersizeBigFn.resize(0, 0, width*0.55, width*0.8)
+	targetUndersizeSmallFn.resize(width*0.55, width*0.8, width)
+	targetIdealSizeFn.resize(width*0.8, width, width*1.2)
+	targetOversizeSmallFn.resize(width, width*1.2, width*1.45)
+	targetOversizeBigFn.resize(width*1.2, width*1.45, 1000, 1000)
 
 def listener():
 	rospy.Subscriber('/zumo/object_data', Int16MultiArray, objectDataCallback)

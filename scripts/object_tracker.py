@@ -17,6 +17,7 @@ def publishObjectData(horizontalPos, size):
 	objectPub.publish(data)
 
 def publishNewObject(size):
+	print "Publishing new object"
 	data = Int16()
 	data.data = size
 	newObjectPub.publish(data)
@@ -27,6 +28,7 @@ def publishPowerData():
 	powerPub.publish(data)
 
 def startNewObject(x):
+	print("Starting new object")
 	global newObject
 	newObject = True
 

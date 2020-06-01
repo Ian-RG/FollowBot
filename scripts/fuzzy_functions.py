@@ -5,6 +5,11 @@ class FuzzyTriangle:
 		self.left = left
 		self.middle = middle
 		self.right = right
+
+	def resize(self, left, middle, right):
+		self.left = left
+		self.middle = middle
+		self.right = right
 	
 	def getMembership(self, v):
 		if v < self.left: 
@@ -19,6 +24,12 @@ class FuzzyTriangle:
 
 class FuzzyTrapezoid:
 	def __init__(self, left, midLeft, midRight, right):
+		self.left = left
+		self.midLeft = midLeft
+		self.midRight = midRight
+		self.right = right
+
+	def resize(self, left, midLeft, midRight, right):
 		self.left = left
 		self.midLeft = midLeft
 		self.midRight = midRight

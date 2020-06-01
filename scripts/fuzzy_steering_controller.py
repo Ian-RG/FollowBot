@@ -131,13 +131,13 @@ def objectDataCallback(data):
 	publishData(leftPower, rightPower)
 
 def newObjectCallback(data):
+	#print "New object in steering!"
 	width = data.data
-	global targetUndersizeBigFn, targetUndersizeSmallFn, targetIdealSizeFn, targetOversizeSmallFn, targetOversizeSmallFn
-	targetUndersizeBigFn = FuzzyTrapezoid(0, 0, width*0.55, width*0.8)
-	targetUndersizeSmallFn = FuzzyTriangle(width*0.55, width*0.8, width)
-	targetIdealSizeFn = FuzzyTriangle(width*0.8, width, width*1.2)
-	targetOversizeSmallFn = FuzzyTriangle(width, width*1.2, width*1.45)
-	targetOversizeBigFn = FuzzyTrapezoid(width*1.2, width*1.45, 1000, 1000)
+	targetUndersizeBigFn.resize(0, 0, width*0.55, width*0.8)
+	targetUndersizeSmallFn.resize(width*0.55, width*0.8, width)
+	targetIdealSizeFn.resize(width*0.8, width, width*1.2)
+	targetOversizeSmallFn.resize(width, width*1.2, width*1.45)
+	targetOversizeBigFn.resize(width*1.2, width*1.45, 1000, 1000)
 
 def listener():
 	rospy.Subscriber('/zumo/raw_power', Int16MultiArray, objectDataCallback)
