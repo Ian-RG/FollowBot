@@ -24,13 +24,9 @@ rightSmallFn = FuzzyTriangle(300, 400, 500)
 rightBigFn = FuzzyTrapezoid(400, 500, 1000, 1000)
 
 HARD_TURN_LEFT = -1
-MED_HARD_TURN_LEFT = -0.75
-MED_SOFT_TURN_LEFT = -0.5
-SOFT_TURN_LEFT = -0.25
+SOFT_TURN_LEFT = -0.5
 NO_TURN = 0
-SOFT_TURN_RIGHT = 0.25
-MED_SOFT_TURN_RIGHT = 0.5
-MED_HARD_TURN_RIGHT = 0.75
+SOFT_TURN_RIGHT = 0.5
 HARD_TURN_RIGHT = 1
 
 stampId = 0
@@ -59,39 +55,39 @@ def adjustPowerForTurning(power, objectPosition, objectDimension):
 
 	memberships = []
 	if closeBig > 0:		
-		if rightBig > 0: memberships.append([(closeBig+rightBig)/2, MED_HARD_TURN_RIGHT])
-		if rightSmall > 0: memberships.append([(closeBig+rightSmall)/2, MED_HARD_TURN_RIGHT])
+		if rightBig > 0: memberships.append([(closeBig+rightBig)/2, HARD_TURN_RIGHT])
+		if rightSmall > 0: memberships.append([(closeBig+rightSmall)/2, SOFT_TURN_RIGHT])
 		if centre > 0: memberships.append([(closeBig+centre)/2, NO_TURN])
-		if leftSmall > 0: memberships.append([(closeBig+leftSmall)/2, MED_HARD_TURN_LEFT])
-		if leftBig > 0: memberships.append([(closeBig+leftBig)/2, MED_HARD_TURN_LEFT])
+		if leftSmall > 0: memberships.append([(closeBig+leftSmall)/2, SOFT_TURN_LEFT])
+		if leftBig > 0: memberships.append([(closeBig+leftBig)/2, HARD_TURN_LEFT])
 		
 	if (closeSmall > 0):
-		if rightBig > 0: memberships.append([(closeSmall+rightBig)/2, MED_HARD_TURN_RIGHT])
-		if rightSmall > 0: memberships.append([(closeSmall+rightSmall)/2, MED_SOFT_TURN_RIGHT])
+		if rightBig > 0: memberships.append([(closeSmall+rightBig)/2, HARD_TURN_RIGHT])
+		if rightSmall > 0: memberships.append([(closeSmall+rightSmall)/2, SOFT_TURN_RIGHT])
 		if centre > 0: memberships.append([(closeSmall+centre)/2, NO_TURN])
-		if leftSmall > 0: memberships.append([(closeSmall+leftSmall)/2, MED_HARD_TURN_LEFT])
-		if leftBig > 0: memberships.append([(closeSmall+leftBig)/2, MED_SOFT_TURN_LEFT])
+		if leftSmall > 0: memberships.append([(closeSmall+leftSmall)/2, SOFT_TURN_LEFT])
+		if leftBig > 0: memberships.append([(closeSmall+leftBig)/2, HARD_TURN_LEFT])
 
 	if (atTarget > 0): 
-		if rightBig > 0: memberships.append([(atTarget+rightBig)/2, MED_HARD_TURN_RIGHT])
-		if rightSmall > 0: memberships.append([(atTarget+rightSmall)/2, MED_SOFT_TURN_RIGHT])
+		if rightBig > 0: memberships.append([(atTarget+rightBig)/2, HARD_TURN_RIGHT])
+		if rightSmall > 0: memberships.append([(atTarget+rightSmall)/2, SOFT_TURN_RIGHT])
 		if centre > 0: memberships.append([(atTarget+centre)/2, NO_TURN])
-		if leftSmall > 0: memberships.append([(atTarget+leftSmall)/2, MED_SOFT_TURN_LEFT])
-		if leftBig > 0: memberships.append([(atTarget+leftBig)/2, MED_HARD_TURN_LEFT])
+		if leftSmall > 0: memberships.append([(atTarget+leftSmall)/2, SOFT_TURN_LEFT])
+		if leftBig > 0: memberships.append([(atTarget+leftBig)/2, HARD_TURN_LEFT])
 
 	if (farSmall > 0): 
-		if rightBig > 0: memberships.append([(farSmall+rightBig)/2, MED_SOFT_TURN_RIGHT])
+		if rightBig > 0: memberships.append([(farSmall+rightBig)/2, HARD_TURN_RIGHT])
 		if rightSmall > 0: memberships.append([(farSmall+rightSmall)/2, SOFT_TURN_RIGHT])
 		if centre > 0: memberships.append([(farSmall+centre)/2, NO_TURN])
-		if leftSmall > 0: memberships.append([(farSmall+leftSmall)/2, SOFT_TURN_LEFT])
-		if leftBig > 0: memberships.append([(farSmall+leftBig)/2, MED_SOFT_TURN_LEFT])
+		if leftSmall > 0: memberships.append([(farSmall+leftSmall)/2, HARD_TURN_LEFT])
+		if leftBig > 0: memberships.append([(farSmall+leftBig)/2, SOFT_TURN_LEFT])
 
 	if (farBig > 0): 
-		if rightBig > 0: memberships.append([(farBig+rightBig)/2, SOFT_TURN_RIGHT])
+		if rightBig > 0: memberships.append([(farBig+rightBig)/2, HARD_TURN_RIGHT])
 		if rightSmall > 0: memberships.append([(farBig+rightSmall)/2, SOFT_TURN_RIGHT])
 		if centre > 0: memberships.append([(farBig+centre)/2, NO_TURN])
 		if leftSmall > 0: memberships.append([(farBig+leftSmall)/2, SOFT_TURN_LEFT])
-		if leftBig > 0: memberships.append([(farBig+leftBig)/2, SOFT_TURN_LEFT])
+		if leftBig > 0: memberships.append([(farBig+leftBig)/2, HARD_TURN_LEFT])
 
 	weightedAreaSum = 0
 	areaSum = 0
