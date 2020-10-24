@@ -10,11 +10,11 @@ rospy.init_node('fuzzy_steering_controller', anonymous=True)
 pub = rospy.Publisher('/zumo/power', Int16MultiArray, queue_size = 1)
 
 #Lateral movement of target
-movingLeftBigFn = FuzzyTrapezoid(-20, -20, -10, -5)
-movingLeftSmallFn = FuzzyTriangle(-10, -5, 0)
-notMovingFn = FuzzyTriangle(-5, 0, 5)
-movingRightSmallFn = FuzzyTriangle(0, 5, 10)
-movingRightBigFn = FuzzyTrapezoid(5, 10, 20, 20)
+movingLeftBigFn = FuzzyTrapezoid(-200, -200, -20, -10)
+movingLeftSmallFn = FuzzyTriangle(-20, -10, 0)
+notMovingFn = FuzzyTriangle(-10, 0, 10)
+movingRightSmallFn = FuzzyTriangle(0, 10, 20)
+movingRightBigFn = FuzzyTrapezoid(10, 20, 200, 200)
 
 #Object position relative to centre of frame
 leftBigFn = FuzzyTrapezoid(-100, -100, 100, 200)
@@ -23,11 +23,11 @@ centreFn = FuzzyTriangle(250, 300, 350)
 rightSmallFn = FuzzyTriangle(300, 400, 500)
 rightBigFn = FuzzyTrapezoid(400, 500, 1000, 1000)
 
-HARD_LEFT_TURN = -0.5
-SOFT_LEFT_TURN = -0.025
+HARD_LEFT_TURN = -0.1
+SOFT_LEFT_TURN = -0.05
 NO_TURN = 0
-SOFT_RIGHT_TURN = 0.025
-HARD_RIGHT_TURN = 0.05
+SOFT_RIGHT_TURN = 0.05
+HARD_RIGHT_TURN = 0.1
 
 stampId = 0
 
@@ -105,6 +105,9 @@ def adjustPowerForTurning(power, objectPosition, lateralDeltaV):
 	if (areaSum != 0):
 		turnRatio += weightedAreaSum / areaSum
 
+	if turnRatio > 1: turnRatio = 1
+	elif turnRatio < -1: turnRatio = -1
+
 	#When reversing, the track opposite the turn needs to be slowed (ie slow the right track for a left turn when reversing)
 	leftPower = rightPower = power
 	if (turnRatio < 0):
@@ -128,6 +131,7 @@ def objectDataCallback(data):
 
 	#Negative for right movement, positive for left
 	lateralDeltaV = objectPosition - previousObjectPosition
+	print lateralDeltaV
 
 	leftPower, rightPower = adjustPowerForTurning(power, objectPosition, lateralDeltaV)
 
