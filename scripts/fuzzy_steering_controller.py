@@ -23,11 +23,11 @@ centreFn = FuzzyTriangle(250, 300, 350)
 rightSmallFn = FuzzyTriangle(300, 400, 500)
 rightBigFn = FuzzyTrapezoid(400, 500, 1000, 1000)
 
-HARD_LEFT_TURN = -0.2
-SOFT_LEFT_TURN = -0.1
+HARD_LEFT_TURN = -0.5
+SOFT_LEFT_TURN = -0.025
 NO_TURN = 0
-SOFT_RIGHT_TURN = 0.1
-HARD_RIGHT_TURN = 0.2
+SOFT_RIGHT_TURN = 0.025
+HARD_RIGHT_TURN = 0.05
 
 stampId = 0
 
