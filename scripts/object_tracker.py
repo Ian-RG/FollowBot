@@ -44,12 +44,6 @@ try:
 	#Capture default video stream
 	cap = cv2.VideoCapture(0)
 
-	#Resize image
-	r = 400.0 / cap.shape[1]
-	dim = (400, int(cap.shape[0] * r))
-
-	cap = cv2.resize(cap, dim, interpolation = cv2.INTER_AREA)
-
 	cv2.namedWindow("Tracking")
 	#Create trackbars for setting values. Initialize lower boundaries to 0, uppers to 255
 	cv2.createTrackbar("Lower Hue", "Tracking", 0, 255, nothing)
